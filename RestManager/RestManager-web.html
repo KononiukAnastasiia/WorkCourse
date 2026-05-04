@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RestManager — Система управління рестораном</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f6f8fa;--bg3:#eef1f4;
+  --text:#1a1a2e;--text2:#4a5568;--text3:#888;
+  --border:#e2e8f0;--border2:#cbd5e0;
+  --purple:#5850c8;--purple-l:#eeedfe;--purple-d:#3c3489;
+  --teal:#0f6e56;--teal-l:#e1f5ee;
+  --amber:#854f0b;--amber-l:#faeeda;
+  --red:#a32d2d;--red-l:#fcebeb;
+  --green:#3b6d11;--green-l:#eaf3de;
+  --gray:#5f5e5a;--gray-l:#f1efe8;
+  --sidebar:220px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
+
+/* SIDEBAR */
+aside{width:var(--sidebar);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.app-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.app-logo h1{font-size:16px;font-weight:600;color:var(--purple)}
+.app-logo p{font-size:11px;color:var(--text3);margin-top:2px}
+nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-section{margin-bottom:4px}
+.nav-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:8px 16px 4px}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:8px 16px;border:none;background:transparent;color:var(--text2);font-size:13px;cursor:pointer;text-align:left;border-radius:0}
+.nav-btn:hover{background:var(--bg2);color:var(--text)}
+.nav-btn.active{background:var(--purple-l);color:var(--purple-d);font-weight:500}
+.nav-icon{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+/* MAIN */
+main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{padding:12px 20px;border-bottom:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar h2{font-size:16px;font-weight:500}
+.topbar-actions{display:flex;gap:8px}
+button{padding:7px 14px;border:0.5px solid var(--border2);border-radius:8px;background:var(--bg);color:var(--text2);cursor:pointer;font-size:13px;transition:background .1s}
+button:hover{background:var(--bg2)}
+button.primary{background:var(--purple);color:#fff;border-color:var(--purple)}
+button.primary:hover{background:var(--purple-d)}
+button.danger{background:var(--red-l);color:var(--red);border-color:var(--red)}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* CARDS & GRIDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--bg2);border-radius:8px;padding:14px;text-align:center}
+.stat-n{font-size:22px;font-weight:600}
+.stat-l{font-size:11px;color:var(--text3);margin-top:2px}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-size:14px;font-weight:500}
+.card-body{padding:0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);border-bottom:0.5px solid var(--border)}
+td{padding:11px 16px;border-bottom:0.5px solid var(--border);color:var(--text2)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.badge-purple{background:var(--purple-l);color:var(--purple-d)}
+.badge-teal{background:var(--teal-l);color:var(--teal)}
+.badge-amber{background:var(--amber-l);color:var(--amber)}
+.badge-red{background:var(--red-l);color:var(--red)}
+.badge-green{background:var(--green-l);color:var(--green)}
+.badge-gray{background:var(--gray-l);color:var(--gray)}
+
+/* MODAL */
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal{background:var(--bg);border-radius:12px;padding:24px;width:420px;max-width:calc(100vw - 32px)}
+.modal h3{font-size:16px;font-weight:500;margin-bottom:16px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+input,select{width:100%;padding:8px 10px;border:0.5px solid var(--border2);border-radius:7px;font-size:13px;color:var(--text);background:var(--bg);outline:none}
+input:focus,select:focus{border-color:var(--purple)}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.empty{padding:32px;text-align:center;color:var(--text3);font-size:13px}
+
+/* ORDER BUILDER */
+.order-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;height:calc(100vh - 130px)}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:16px;overflow-y:auto}
+.dish-card{border:0.5px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;background:var(--bg);transition:border-color .15s}
+.dish-card:hover{border-color:var(--purple)}
+.dish-card.selected{border-color:var(--purple);background:var(--purple-l)}
+.dish-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.dish-cat{font-size:11px;color:var(--text3)}
+.dish-price{font-size:14px;font-weight:600;color:var(--purple);margin-top:6px}
+.order-panel{background:var(--bg);border:0.5px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.order-panel-header{padding:14px 16px;border-bottom:0.5px solid var(--border)}
+.order-items{flex:1;overflow-y:auto;padding:8px}
+.order-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:7px}
+.order-item:hover{background:var(--bg2)}
+.oi-name{flex:1;font-size:13px}
+.oi-qty{display:flex;align-items:center;gap:4px}
+.qty-btn{width:22px;height:22px;border-radius:5px;padding:0;display:flex;align-items:center;justify-content:center;font-size:14px;border:0.5px solid var(--border)}
+.oi-price{font-size:13px;font-weight:500;min-width:60px;text-align:right}
+.order-footer{padding:14px 16px;border-top:0.5px solid var(--border)}
+.order-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.order-total-n{font-size:18px;font-weight:600;color:var(--purple)}
+
+/* REPORT */
+.report-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.rep-card{background:var(--bg);border:0.5px solid var(--border);border-radius:12px;padding:16px}
+.rep-title{font-size:12px;font-weight:500;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.rep-val{font-size:24px;font-weight:600}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px}
+.bar-label{width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)}
+.bar-track{flex:1;background:var(--bg2);border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:var(--purple)}
+.bar-val{width:40px;text-align:right;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="app-logo">
+    <h1>RestManager</h1>
+    <p>Система управління рестораном</p>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Головна</div>
+      <button class="nav-btn active" onclick="showPage('dashboard')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+        Дашборд
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Управління</div>
+      <button class="nav-btn" onclick="showPage('menu')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Меню страв
+      </button>
+      <button class="nav-btn" onclick="showPage('orders')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6M5 5h3M5 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Замовлення
+      </button>
+      <button class="nav-btn" onclick="showPage('new-order')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Нове замовлення
+      </button>
+      <button class="nav-btn" onclick="showPage('staff')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 13c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M12 7v4M10 9h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Персонал
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Аналітика</div>
+      <button class="nav-btn" onclick="showPage('reports')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12L5 8l3 2 3-4 3 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Звіти
+      </button>
+    </div>
+  </nav>
+</aside>
+
+<main id="app">
+  <div class="topbar">
+    <h2 id="page-title">Дашборд</h2>
+    <div class="topbar-actions" id="topbar-actions"></div>
+  </div>
+  <div class="content" id="content"></div>
+</main>
+
+<div id="modal-root"></div>
+
+<script>
+const state = {
+  dishes: [
+    {id:1,name:'Борщ український',price:55,category:'Перші страви',desc:'Класичний борщ зі сметаною'},
+    {id:2,name:'Суп-крем грибний',price:65,category:'Перші страви',desc:'Вершковий суп з печерицями'},
+    {id:3,name:'Курка-гриль',price:120,category:'Другі страви',desc:'Ціла курка з травами'},
+    {id:4,name:'Стейк із свинини',price:145,category:'Другі страви',desc:'З пюре та соусом'},
+    {id:5,name:'Вареники з картоплею',price:70,category:'Другі страви',desc:'З цибулею та сметаною'},
+    {id:6,name:'Цезар з куркою',price:85,category:'Салати',desc:'Класичний салат Цезар'},
+    {id:7,name:'Грецький салат',price:75,category:'Салати',desc:'Із фетою та маслинами'},
+    {id:8,name:'Тірамісу',price:60,category:'Десерти',desc:'Класичний італійський десерт'},
+    {id:9,name:'Чізкейк',price:55,category:'Десерти',desc:'З ягідним соусом'},
+    {id:10,name:'Лимонад домашній',price:35,category:'Напої',desc:'Свіжий лимонад з м\'ятою'},
+    {id:11,name:'Кава американо',price:40,category:'Напої',desc:'Еспресо з водою'},
+    {id:12,name:'Апельсиновий фреш',price:50,category:'Напої',desc:'Свіжовичавлений сік'},
+  ],
+  orders: [
+    {id:1,client:'Іванченко Олег',phone:'050-111-22-33',status:'COMPLETED',items:[{dishId:3,qty:1},{dishId:6,qty:1},{dishId:11,qty:2}],createdAt:'2025-04-10 12:30'},
+    {id:2,client:'Мельник Юлія',phone:'067-444-55-66',status:'IN_PROGRESS',items:[{dishId:1,qty:2},{dishId:8,qty:1}],createdAt:'2025-04-12 13:15'},
+    {id:3,client:'Коваль Петро',phone:'',status:'CREATED',items:[{dishId:4,qty:1},{dishId:7,qty:1},{dishId:10,qty:2}],createdAt:'2025-04-12 14:00'},
+  ],
+  staff: [
+    {id:1,name:'Петренко Ірина',role:'Адміністратор',salary:35000,extra:'Загальне управління'},
+    {id:2,name:'Коваленко Михайло',role:'Кухар',salary:28000,extra:'Гаряча кухня'},
+    {id:3,name:'Бондаренко Олена',role:'Кухар',salary:25000,extra:'Десерти та випічка'},
+    {id:4,name:'Лисенко Андрій',role:'Офіціант',salary:18000,extra:'5 столиків'},
+    {id:5,name:'Мороз Наталія',role:'Офіціант',salary:18000,extra:'4 столики'},
+  ],
+  nextDishId:13, nextOrderId:4, nextStaffId:6,
+  newOrderItems: [],
+};
+
+const STATUS = {
+  CREATED:{label:'Створено',cls:'badge-gray'},
+  IN_PROGRESS:{label:'В процесі',cls:'badge-amber'},
+  COMPLETED:{label:'Виконано',cls:'badge-teal'},
+  CLOSED:{label:'Закрито',cls:'badge-gray'},
+};
+const ROLES = ['Офіціант','Кухар','Адміністратор'];
+
+function getDish(id){ return state.dishes.find(d=>d.id===id); }
+function orderTotal(order){ return order.items.reduce((s,i)=>{ const d=getDish(i.dishId); return s+(d?d.price*i.qty:0); },0); }
+function fmt(n){ return n.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function initials(name){ return name.split(' ').slice(0,2).map(w=>w[0]).join(''); }
+function roleBadge(role){
+  if(role==='Адміністратор') return 'badge-purple';
+  if(role==='Кухар') return 'badge-teal';
+  return 'badge-amber';
+}
+
+let currentPage='dashboard';
+
+function showPage(page){
+  currentPage=page;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const map={dashboard:0,menu:2,orders:3,'new-order':4,staff:5,reports:7};
+  const btns=document.querySelectorAll('.nav-btn');
+  if(map[page]!==undefined) btns[map[page]]?.classList.add('active');
+  const titles={dashboard:'Дашборд',menu:'Меню страв',orders:'Замовлення','new-order':'Нове замовлення',staff:'Персонал',reports:'Звіти'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  const acts=document.getElementById('topbar-actions');
+  acts.innerHTML='';
+  if(page==='menu') acts.innerHTML='<button class="primary" onclick="openAddDish()">+ Додати страву</button>';
+  if(page==='orders') acts.innerHTML='<button class="primary" onclick="showPage(\'new-order\')">+ Нове замовлення</button>';
+  if(page==='staff') acts.innerHTML='<button class="primary" onclick="openAddStaff()">+ Додати співробітника</button>';
+  const renders={dashboard:renderDashboard,menu:renderMenu,orders:renderOrders,'new-order':renderNewOrder,staff:renderStaff,reports:renderReports};
+  (renders[page]||renderDashboard)();
+}
+
+function renderDashboard(){
+  const revenue=state.orders.filter(o=>o.status==='COMPLETED'||o.status==='CLOSED').reduce((s,o)=>s+orderTotal(o),0);
+  const active=state.orders.filter(o=>o.status==='IN_PROGRESS').length;
+  document.getElementById('content').innerHTML=`
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n" style="color:var(--purple)">${state.dishes.length}</div><div class="stat-l">Страв у меню</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--teal)">${state.orders.length}</div><div class="stat-l">Всього замовлень</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amber)">${active}</div><div class="stat-l">Активних замовлень</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--green)">${fmt(revenue)}</div><div class="stat-l">Дохід (грн)</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Останні замовлення</h3><button onclick="showPage('orders')">Всі замовлення</button></div>
+      <div class="card-body">${ordersTable(state.orders.slice(-3).reverse())}</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Персонал</h3><button onclick="showPage('staff')">Всі</button></div>
+      <div class="card-body">${staffTable(state.staff.slice(0,3))}</div>
+    </div>`;
+}
+
+function ordersTable(orders){
+  if(!orders.length) return '<div class="empty">Замовлень немає</div>';
+  return `<table><thead><tr><th>#</th><th>Клієнт</th><th>Страви</th><th>Сума</th><th>Статус</th><th></th></tr></thead><tbody>`+
+    orders.map(o=>{
+      const s=STATUS[o.status]||STATUS.CREATED;
+      return `<tr>
+        <td style="color:var(--text3)">#${o.id}</td>
+        <td><strong style="font-weight:500">${o.client}</strong><br><span style="font-size:11px;color:var(--text3)">${o.createdAt}</span></td>
+        <td>${o.items.length} позиц.</td>
+        <td style="font-weight:500">${fmt(orderTotal(o))} грн</td>
+        <td><span class="badge ${s.cls}">${s.label}</span></td>
+        <td><button onclick="openOrderDetail(${o.id})">Деталі</button></td>
+      </tr>`;
+    }).join('')+'</tbody></table>';
+}
+
+function staffTable(staff){
+  return `<table><thead><tr><th>Ім'я</th><th>Роль</th><th>Зарплата</th><th>Деталі</th></tr></thead><tbody>`+
+    staff.map(e=>`<tr>
+      <td style="display:flex;align-items:center;gap:8px;padding:11px 16px">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--purple-l);color:var(--purple-d);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0">${initials(e.name)}</div>
+        <span>${e.name}</span>
+      </td>
+      <td><span class="badge ${roleBadge(e.role)}">${e.role}</span></td>
+      <td>${e.salary.toLocaleString()} грн/міс</td>
+      <td style="color:var(--text3);font-size:12px">${e.extra}</td>
+    </tr>`).join('')+'</tbody></table>';
+}
+
+function renderMenu(){
+  const cats=[...new Set(state.dishes.map(d=>d.category))];
+  document.getElementById('content').innerHTML=cats.map(cat=>`
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><h3>${cat}</h3></div>
+      <div class="card-body">
+        <table><thead><tr><th>Назва</th><th>Опис</th><th>Ціна</th><th></th></tr></thead><tbody>
+        ${state.dishes.filter(d=>d.category===cat).map(d=>`<tr>
+          <td style="font-weight:500">${d.name}</td>
+          <td style="color:var(--text3)">${d.desc}</td>
+          <td style="font-weight:500;color:var(--purple)">${fmt(d.price)} грн</td>
+          <td style="display:flex;gap:6px">
+            <button onclick="openEditDish(${d.id})">Ред.</button>
+            <button class="danger" onclick="deleteDish(${d.id})">Видалити</button>
+          </td>
+        </tr>`).join('')}
+        </tbody></table>
+      </div>
+    </div>`).join('');
+}
+
+function renderOrders(){
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-header"><h3>Всі замовлення (${state.orders.length})</h3></div>
+      <div class="card-body">${ordersTable([...state.orders].reverse())}</div>
+    </div>`;
+}
+
+function renderNewOrder(){
+  state.newOrderItems=[];
+  const c=document.getElementById('content');
+  c.innerHTML=`
+    <div class="order-grid">
+      <div class="card" style="margin:0;display:flex;flex-direction:column">
+        <div class="card-header" style="flex-shrink:0">
+          <h3>Вибір страв</h3>
+          <input id="menu-search" placeholder="Пошук..." style="width:160px" oninput="filterMenu()">
+        </div>
+        <div class="menu-grid" id="menu-grid"></div>
+      </div>
+      <div class="order-panel">
+        <div class="order-panel-header">
+          <div style="font-weight:500;margin-bottom:10px">Замовлення</div>
+          <div class="form-group"><label>Ім'я клієнта *</label><input id="client-name" placeholder="Введіть ім'я"></div>
+          <div class="form-group"><label>Телефон</label><input id="client-phone" placeholder="+380..."></div>
+        </div>
+        <div class="order-items" id="order-items"><div class="empty" style="padding:20px">Оберіть страви з меню</div></div>
+        <div class="order-footer">
+          <div class="order-total">
+            <span style="color:var(--text2)">Загальна сума:</span>
+            <span class="order-total-n" id="order-total-n">0.00 грн</span>
+          </div>
+          <button class="primary" style="width:100%" onclick="submitOrder()">Оформити замовлення</button>
+        </div>
+      </div>
+    </div>`;
+  renderMenuGrid();
+  renderOrderPanel();
+}
+
+function filterMenu(){
+  const q=document.getElementById('menu-search')?.value.toLowerCase()||'';
+  const filtered=state.dishes.filter(d=>d.name.toLowerCase().includes(q)||d.category.toLowerCase().includes(q));
+  renderMenuGrid(filtered);
+}
+
+function renderMenuGrid(dishes){
+  const grid=document.getElementById('menu-grid');
+  if(!grid) return;
+  const list=dishes||state.dishes;
+  grid.innerHTML=list.map(d=>{
+    const sel=state.newOrderItems.find(i=>i.dishId===d.id);
+    return `<div class="dish-card${sel?' selected':''}" onclick="toggleDish(${d.id})">
+      <div class="dish-name">${d.name}</div>
+      <div class="dish-cat">${d.category}</div>
+      <div class="dish-price">${fmt(d.price)} грн</div>
+      ${sel?`<div style="margin-top:6px;font-size:11px;color:var(--purple-d);font-weight:500">В замовленні: ${sel.qty} шт.</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleDish(dishId){
+  const existing=state.newOrderItems.find(i=>i.dishId===dishId);
+  if(existing) existing.qty++;
+  else state.newOrderItems.push({dishId,qty:1});
+  renderMenuGrid();
+  renderOrderPanel();
+}
+
+function changeQty(dishId,delta){
+  const idx=state.newOrderItems.findIndex(i=>i.dishId===dishId);
+  if(idx===-1) return;
+  state.newOrderItems[idx].qty+=delta;
+  if(state.newOrderItems[idx].qty<=0) state.newOrderItems.splice(idx,1);
+  renderMenuGrid();
+  renderOrderPanel();
+}
+
+function renderOrderPanel(){
+  const el=document.getElementById('order-items');
+  const tot=document.getElementById('order-total-n');
+  if(!el) return;
+  if(!state.newOrderItems.length){ el.innerHTML='<div class="empty" style="padding:20px">Оберіть страви з меню</div>'; if(tot) tot.textContent='0.00 грн'; return; }
+  let total=0;
+  el.innerHTML=state.newOrderItems.map(i=>{
+    const d=getDish(i.dishId);
+    if(!d) return '';
+    const sub=d.price*i.qty;
+    total+=sub;
+    return `<div class="order-item">
+      <div class="oi-name">${d.name}</div>
+      <div class="oi-qty">
+        <button class="qty-btn" onclick="changeQty(${d.id},-1)">−</button>
+        <span style="font-size:13px;min-width:18px;text-align:center">${i.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${d.id},1)">+</button>
+      </div>
+      <div class="oi-price">${fmt(sub)} грн</div>
+    </div>`;
+  }).join('');
+  if(tot) tot.textContent=fmt(total)+' грн';
+}
+
+function submitOrder(){
+  const name=document.getElementById('client-name')?.value.trim();
+  if(!name){ alert('Введіть ім\'я клієнта'); return; }
+  if(!state.newOrderItems.length){ alert('Додайте хоча б одну страву'); return; }
+  const phone=document.getElementById('client-phone')?.value.trim()||'';
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const dt=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  state.orders.push({id:state.nextOrderId++,client:name,phone,status:'CREATED',items:[...state.newOrderItems],createdAt:dt});
+  state.newOrderItems=[];
+  showPage('orders');
+}
+
+function renderStaff(){
+  document.getElementById('content').innerHTML=`<div class="card"><div class="card-header"><h3>Персонал (${state.staff.length})</h3></div><div class="card-body">${staffTable(state.staff)}</div><div style="padding:0 16px 8px;display:flex;gap:6px;flex-wrap:wrap;border-top:0.5px solid var(--border);padding-top:8px">
+    ${state.staff.map(e=>`<button class="danger" style="font-size:12px;padding:4px 10px" onclick="deleteStaff(${e.id})">Видалити ${e.name.split(' ')[0]}</button>`).join('')}
+  </div></div>`;
+}
+
+function renderReports(){
+  const revenue=state.orders.filter(o=>o.status==='COMPLETED'||o.status==='CLOSED').reduce((s,o)=>s+orderTotal(o),0);
+  const allRev=state.orders.reduce((s,o)=>s+orderTotal(o),0);
+  const completed=state.orders.filter(o=>o.status==='COMPLETED'||o.status==='CLOSED').length;
+  const dishCount={};
+  state.orders.forEach(o=>o.items.forEach(i=>{
+    const d=getDish(i.dishId);
+    if(d) dishCount[d.name]=(dishCount[d.name]||0)+i.qty;
+  }));
+  const top=Object.entries(dishCount).sort((a,b)=>b[1]-a[1]);
+  const maxQty=top[0]?top[0][1]:1;
+  document.getElementById('content').innerHTML=`
+    <div class="report-grid">
+      <div class="rep-card"><div class="rep-title">Загальний дохід</div><div class="rep-val" style="color:var(--teal)">${fmt(revenue)} грн</div><div style="font-size:11px;color:var(--text3);margin-top:4px">виконані замовлення</div></div>
+      <div class="rep-card"><div class="rep-title">Виконано замовлень</div><div class="rep-val" style="color:var(--purple)">${completed} / ${state.orders.length}</div><div style="font-size:11px;color:var(--text3);margin-top:4px">із усіх замовлень</div></div>
+      <div class="rep-card"><div class="rep-title">Середній чек</div><div class="rep-val" style="color:var(--amber)">${state.orders.length?fmt(allRev/state.orders.length):0} грн</div><div style="font-size:11px;color:var(--text3);margin-top:4px">по всіх замовленнях</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Популярність страв</h3></div>
+      <div class="card-body" style="padding:16px">
+        ${top.length?top.map(([name,qty])=>`
+          <div class="bar-row">
+            <div class="bar-label">${name}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round(qty/maxQty*100)}%"></div></div>
+            <div class="bar-val">${qty} шт.</div>
+          </div>`).join(''):'<div class="empty">Даних немає</div>'}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Статуси замовлень</h3></div>
+      <div class="card-body" style="padding:16px;display:flex;gap:16px;flex-wrap:wrap">
+        ${Object.entries(STATUS).map(([k,v])=>{
+          const cnt=state.orders.filter(o=>o.status===k).length;
+          return `<div style="text-align:center"><div style="font-size:22px;font-weight:600">${cnt}</div><span class="badge ${v.cls}" style="margin-top:4px">${v.label}</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function openAddDish(){
+  showModal(`<h3>Нова страва</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Назва *</label><input id="m-name" placeholder="Назва страви"></div>
+      <div class="form-group"><label>Ціна (грн) *</label><input id="m-price" type="number" placeholder="0.00"></div>
+    </div>
+    <div class="form-group"><label>Категорія</label><input id="m-cat" placeholder="Напр. Салати"></div>
+    <div class="form-group"><label>Опис</label><input id="m-desc" placeholder="Короткий опис"></div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Скасувати</button>
+      <button class="primary" onclick="saveDish()">Додати</button>
+    </div>`);
+}
+
+function openEditDish(id){
+  const d=getDish(id);
+  if(!d) return;
+  showModal(`<h3>Редагувати страву</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Назва *</label><input id="m-name" value="${d.name}"></div>
+      <div class="form-group"><label>Ціна (грн) *</label><input id="m-price" type="number" value="${d.price}"></div>
+    </div>
+    <div class="form-group"><label>Категорія</label><input id="m-cat" value="${d.category}"></div>
+    <div class="form-group"><label>Опис</label><input id="m-desc" value="${d.desc}"></div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Скасувати</button>
+      <button class="primary" onclick="saveDish(${id})">Зберегти</button>
+    </div>`);
+}
+
+function saveDish(id){
+  const name=document.getElementById('m-name')?.value.trim();
+  const price=parseFloat(document.getElementById('m-price')?.value);
+  const category=document.getElementById('m-cat')?.value.trim()||'Інше';
+  const desc=document.getElementById('m-desc')?.value.trim()||'';
+  if(!name||isNaN(price)||price<=0){ alert('Введіть назву та коректну ціну'); return; }
+  if(id){ const d=getDish(id); if(d){d.name=name;d.price=price;d.category=category;d.desc=desc;} }
+  else state.dishes.push({id:state.nextDishId++,name,price,category,desc});
+  closeModal(); renderMenu();
+}
+
+function deleteDish(id){
+  if(!confirm('Видалити страву?')) return;
+  state.dishes=state.dishes.filter(d=>d.id!==id);
+  renderMenu();
+}
+
+function openAddStaff(){
+  showModal(`<h3>Новий співробітник</h3>
+    <div class="form-group"><label>Ім'я *</label><input id="m-name" placeholder="Прізвище Ім'я"></div>
+    <div class="form-group"><label>Роль</label><select id="m-role">${ROLES.map(r=>`<option>${r}</option>`).join('')}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Зарплата (грн)</label><input id="m-salary" type="number" placeholder="20000"></div>
+      <div class="form-group"><label>Деталі</label><input id="m-extra" placeholder="Спеціалізація..."></div>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Скасувати</button>
+      <button class="primary" onclick="saveStaff()">Додати</button>
+    </div>`);
+}
+
+function saveStaff(){
+  const name=document.getElementById('m-name')?.value.trim();
+  const role=document.getElementById('m-role')?.value;
+  const salary=parseFloat(document.getElementById('m-salary')?.value)||0;
+  const extra=document.getElementById('m-extra')?.value.trim()||'';
+  if(!name){ alert('Введіть ім\'я'); return; }
+  state.staff.push({id:state.nextStaffId++,name,role,salary,extra});
+  closeModal(); renderStaff();
+}
+
+function deleteStaff(id){
+  if(!confirm('Видалити співробітника?')) return;
+  state.staff=state.staff.filter(e=>e.id!==id);
+  renderStaff();
+}
+
+function openOrderDetail(id){
+  const o=state.orders.find(x=>x.id===id);
+  if(!o) return;
+  const s=STATUS[o.status]||STATUS.CREATED;
+  showModal(`<h3>Замовлення #${o.id}</h3>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <span style="color:var(--text2)">${o.client}</span>
+      <span class="badge ${s.cls}">${s.label}</span>
+    </div>
+    <table style="margin-bottom:12px"><tbody>
+      ${o.items.map(i=>{ const d=getDish(i.dishId); return d?`<tr><td style="padding:6px 0">${d.name}</td><td style="padding:6px 8px;color:var(--text3)">x${i.qty}</td><td style="padding:6px 0;font-weight:500;text-align:right">${fmt(d.price*i.qty)} грн</td></tr>`:''; }).join('')}
+    </tbody></table>
+    <div style="display:flex;justify-content:space-between;font-weight:500;padding:8px 0;border-top:0.5px solid var(--border)">
+      <span>Разом</span><span style="color:var(--purple)">${fmt(orderTotal(o))} грн</span>
+    </div>
+    <div class="form-group" style="margin-top:14px"><label>Змінити статус</label>
+      <select id="m-status" onchange="changeStatus(${o.id},this.value)">
+        ${Object.entries(STATUS).map(([k,v])=>`<option value="${k}"${o.status===k?' selected':''}>${v.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions"><button onclick="closeModal()">Закрити</button></div>`);
+}
+
+function changeStatus(id,status){
+  const o=state.orders.find(x=>x.id===id);
+  if(o) o.status=status;
+}
+
+function showModal(html){
+  const r=document.getElementById('modal-root');
+  r.innerHTML=`<div class="modal-backdrop" onclick="closeModalOnBack(event)"><div class="modal">${html}</div></div>`;
+}
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+function closeModalOnBack(e){ if(e.target===e.currentTarget) closeModal(); }
+
+showPage('dashboard');
+</script>
+</body>
+</html>
