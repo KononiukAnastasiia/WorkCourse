@@ -8,7 +8,15 @@ import ua.edu.restaurant.repository.EmployeeRepository;
 
 public class DataInitializer {
 
-    public static void init(DishRepository dishRepository, EmployeeRepository employeeRepository) {
+    // Наповнює БД тільки якщо вона порожня — щоб не дублювати дані при кожному запуску
+    public static void initIfEmpty(DishRepository dishRepository, EmployeeRepository employeeRepository) {
+        if (!dishRepository.findAll().isEmpty()) {
+            System.out.println("[DB] Дані вже існують, пропускаємо ініціалізацію.");
+            return;
+        }
+
+        System.out.println("[DB] Наповнення тестовими даними...");
+
         // Меню — страви
         dishRepository.saveNew("Борщ українських",     55.00, "Перші страви",  "Класичний борщ зі сметаною");
         dishRepository.saveNew("Суп-крем грибний",     65.00, "Перші страви",  "Вершковий суп з печерицями");
@@ -24,19 +32,12 @@ public class DataInitializer {
         dishRepository.saveNew("Апельсиновий фреш",   50.00, "Напої",         "Свіжовичавлений сік");
 
         // Персонал
-        int id1 = employeeRepository.getNextId();
-        employeeRepository.save(new Administrator(id1, "Петренко Ірина",  35000, "Загальне управління"));
+        employeeRepository.save(new Administrator(employeeRepository.getNextId(), "Петренко Ірина",  35000, "Загальне управління"));
+        employeeRepository.save(new Cook(employeeRepository.getNextId(),          "Коваленко Михайло", 28000, "Гаряча кухня"));
+        employeeRepository.save(new Cook(employeeRepository.getNextId(),          "Бондаренко Олена",  25000, "Десерти та випічка"));
+        employeeRepository.save(new Waiter(employeeRepository.getNextId(),        "Лисенко Андрій",   18000, 5));
+        employeeRepository.save(new Waiter(employeeRepository.getNextId(),        "Мороз Наталія",    18000, 4));
 
-        int id2 = employeeRepository.getNextId();
-        employeeRepository.save(new Cook(id2, "Коваленко Михайло", 28000, "Гаряча кухня"));
-
-        int id3 = employeeRepository.getNextId();
-        employeeRepository.save(new Cook(id3, "Бондаренко Олена",  25000, "Десерти та випічка"));
-
-        int id4 = employeeRepository.getNextId();
-        employeeRepository.save(new Waiter(id4, "Лисенко Андрій",   18000, 5));
-
-        int id5 = employeeRepository.getNextId();
-        employeeRepository.save(new Waiter(id5, "Мороз Наталія",    18000, 4));
+        System.out.println("[DB] Тестові дані додано.");
     }
 }
