@@ -13,6 +13,8 @@ public class DatabaseConnection {
             connection = DriverManager.getConnection(URL);
             // Вмикаємо підтримку зовнішніх ключів
             connection.createStatement().execute("PRAGMA foreign_keys = ON");
+            // WAL режим — дозволяє одночасний доступ з кількох програм
+            connection.createStatement().execute("PRAGMA journal_mode = WAL");
         }
         return connection;
     }

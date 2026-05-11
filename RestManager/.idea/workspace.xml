@@ -4,33 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="535c7432-3bcf-481a-b643-8f86a00eece1" name="Changes" comment="Додано базу данних">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/11ae4c98-121b-459e-8883-3aa3fc444e99.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/11ae4c98-121b-459e-8883-3aa3fc444e99/storage_v2/_src_/schema/main.uQUzAA.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/725606b3-0ad3-4696-874c-e5ff1dc325b1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/725606b3-0ad3-4696-874c-e5ff1dc325b1/storage_v2/_src_/schema/main.uQUzAA.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/sqlite_jdbc_3_53_1_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/sqlite-jdbc-3.53.1.0.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/restaurant.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DatabaseConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DatabaseInitializer.java" afterDir="false" />
+    <list default="true" id="535c7432-3bcf-481a-b643-8f86a00eece1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/webserver/src/test/java/ua/edu/restaurant/webserver/model/DishTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/11ae4c98-121b-459e-8883-3aa3fc444e99.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/11ae4c98-121b-459e-8883-3aa3fc444e99/storage_v2/_src_/schema/main.uQUzAA.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RestManager.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RestManager.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/app/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/app/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/DishRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/DishRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/EmployeeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/EmployeeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/restaurant.db" beforeDir="false" afterPath="$PROJECT_DIR$/restaurant.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/OrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DataInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DatabaseConnection.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JUnit5 Test Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -47,6 +44,13 @@
     &quot;accountId&quot;: &quot;360f8b95-4692-4556-b856-95150912a424&quot;
   }
 }</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -62,21 +66,30 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
+    "JUnit.DishTest.executor": "Run",
+    "JUnit.DishTest.testToString.executor": "Run",
+    "JUnit.WebserverApplicationTests.contextLoads.executor": "Run",
+    "JUnit.WebserverApplicationTests.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SHELLCHECK.PATH": "C:\\Users\\admir\\AppData\\Roaming\\JetBrains\\IntelliJIdea2026.1\\plugins\\Shell Script\\shellcheck.exe",
+    "Spring Boot.WebserverApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Coursework/RestManager",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "SQL Dialects"
@@ -92,7 +105,15 @@
     ]
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="ua.edu.restaurant.webserver.model" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="ua.edu.restaurant.app.Main" />
       <module name="RestManager" />
@@ -101,6 +122,91 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="DishTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="webserver" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ua.edu.restaurant.webserver.model.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ua.edu.restaurant.webserver.model" />
+      <option name="MAIN_CLASS_NAME" value="ua.edu.restaurant.webserver.model.DishTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DishTest.testToString" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="webserver" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ua.edu.restaurant.webserver.model.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ua.edu.restaurant.webserver.model" />
+      <option name="MAIN_CLASS_NAME" value="ua.edu.restaurant.webserver.model.DishTest" />
+      <option name="METHOD_NAME" value="testToString" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebserverApplicationTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="webserver" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ua.edu.restaurant.webserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ua.edu.restaurant.webserver" />
+      <option name="MAIN_CLASS_NAME" value="ua.edu.restaurant.webserver.WebserverApplicationTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebserverApplicationTests.contextLoads" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="webserver" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ua.edu.restaurant.webserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="ua.edu.restaurant.webserver" />
+      <option name="MAIN_CLASS_NAME" value="ua.edu.restaurant.webserver.WebserverApplicationTests" />
+      <option name="METHOD_NAME" value="contextLoads" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebserverApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
+      <module name="webserver" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="ua.edu.restaurant.webserver.WebserverApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ua.edu.restaurant.webserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.WebserverApplication" />
+        <item itemvalue="JUnit.DishTest.testToString" />
+        <item itemvalue="JUnit.DishTest" />
+        <item itemvalue="JUnit.WebserverApplicationTests" />
+        <item itemvalue="JUnit.WebserverApplicationTests.contextLoads" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -110,6 +216,15 @@
       <option name="presentableId" value="Default" />
       <updated>1777898307316</updated>
     </task>
+    <task id="LOCAL-00001" summary="Додано базу данних">
+      <option name="closed" value="true" />
+      <created>1778239742629</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1778239742629</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -141,6 +256,21 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Додано базу данних" />
     <option name="LAST_COMMIT_MESSAGE" value="Додано базу данних" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/webserver/src/main/java/ua/edu/restaurant/webserver/model/Dish.java</url>
+          <line>21</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.ExceptionInInitializerError" package="java.lang" />
+          <option name="timeStamp" value="4" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

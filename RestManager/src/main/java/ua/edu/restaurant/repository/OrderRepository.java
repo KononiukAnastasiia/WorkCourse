@@ -102,32 +102,18 @@ public class OrderRepository {
         }
     }
 
-    public Order findById(int id) {
-        String sql = "SELECT o.*, c.name as cname, c.phone as cphone " +
-                     "FROM orders o JOIN clients c ON o.client_id = c.id WHERE o.id=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (!rs.next()) return null;
-            return mapOrder(rs);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Помилка пошуку замовлення: " + e.getMessage());
-        }
-    }
 
     public List<Order> findAll() {
         List<Order> list = new ArrayList<>();
         String sql = "SELECT o.*, c.name as cname, c.phone as cphone " +
-                     "FROM orders o JOIN clients c ON o.client_id = c.id ORDER BY o.id DESC";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+                "FROM orders o JOIN clients c ON o.client_id = c.id ORDER BY o.id DESC";
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) list.add(mapOrder(rs));
-
+            rs.close();
+            stmt.close();
         } catch (SQLException e) {
             throw new RuntimeException("Помилка отримання замовлень: " + e.getMessage());
         }
@@ -137,14 +123,15 @@ public class OrderRepository {
     public List<Order> findByStatus(OrderStatus status) {
         List<Order> list = new ArrayList<>();
         String sql = "SELECT o.*, c.name as cname, c.phone as cphone " +
-                     "FROM orders o JOIN clients c ON o.client_id = c.id WHERE o.status=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
+                "FROM orders o JOIN clients c ON o.client_id = c.id WHERE o.status=?";
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, status.name());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) list.add(mapOrder(rs));
-
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
             throw new RuntimeException("Помилка фільтрації замовлень: " + e.getMessage());
         }
@@ -176,23 +163,24 @@ public class OrderRepository {
 
     private void loadItems(Order order) {
         String sql = "SELECT oi.*, d.name, d.price, d.category, d.description " +
-                     "FROM order_items oi JOIN dishes d ON oi.dish_id = d.id WHERE oi.order_id=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
+                "FROM order_items oi JOIN dishes d ON oi.dish_id = d.id WHERE oi.order_id=?";
+        try {
+            Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, order.getId());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Dish dish = new Dish(
-                    rs.getInt("dish_id"),
-                    rs.getString("name"),
-                    rs.getDouble("price"),
-                    rs.getString("category"),
-                    rs.getString("description")
+                        rs.getInt("dish_id"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getString("category"),
+                        rs.getString("description")
                 );
                 order.addItem(new OrderItem(dish, rs.getInt("quantity")));
             }
-
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
             throw new RuntimeException("Помилка завантаження позицій: " + e.getMessage());
         }

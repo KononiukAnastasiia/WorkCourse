@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RestManager</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--bg2:#161616;--bg3:#1e1e1e;--bg4:#252525;--border:#2a2a2a;--border2:#333;--text:#e8e8e8;--text2:#999;--text3:#555;--accent:#c8f060;--accent2:#1a2200;--red:#ff5f57;--red2:#2a0a0a;--amber:#f5a623;--amber2:#251500;--teal:#4ecdc4;--teal2:#0a1f1e;--blue:#5b9cf6;--blue2:#0a1428}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
+aside{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.logo{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.logo-name{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--accent);letter-spacing:.05em}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:2px;letter-spacing:.08em;text-transform:uppercase}
+nav{flex:1;padding:8px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;color:var(--text2);font-size:13px;border-left:2px solid transparent;transition:all .15s}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent2)}
+.nav-icon{width:16px;height:16px;opacity:.7;flex-shrink:0}
+.nav-item.active .nav-icon{opacity:1}
+.nav-section{font-size:10px;color:var(--text3);padding:12px 16px 4px;letter-spacing:.1em;text-transform:uppercase}
+main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg2);flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:500}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.content{flex:1;overflow-y:auto;padding:24px}
+button{font-family:'IBM Plex Sans',sans-serif;cursor:pointer;font-size:13px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);padding:7px 14px;transition:all .15s}
+button:hover{background:var(--bg4);color:var(--text)}
+button.primary{background:var(--accent);color:#0f0f0f;border-color:var(--accent);font-weight:600}
+button.primary:hover{background:#d4f570}
+button.danger{background:var(--red2);color:var(--red);border-color:#3a1a1a}
+button.success{background:var(--teal2);color:var(--teal);border-color:#0f2f2e}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.stat-n{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500}
+.stat-l{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-header h3{font-size:13px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 20px;text-align:left;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);border-bottom:1px solid var(--border)}
+td{padding:12px 20px;border-bottom:1px solid var(--border);color:var(--text2);font-size:13px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;font-family:'IBM Plex Mono',monospace}
+.badge-green{background:var(--accent2);color:var(--accent)}
+.badge-red{background:var(--red2);color:var(--red)}
+.badge-amber{background:var(--amber2);color:var(--amber)}
+.badge-blue{background:var(--blue2);color:var(--blue)}
+.badge-teal{background:var(--teal2);color:var(--teal)}
+.badge-gray{background:var(--bg3);color:var(--text3)}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(2px)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:24px;width:440px;max-width:calc(100vw - 32px)}
+.modal h3{font-size:15px;font-weight:500;margin-bottom:20px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+input,select{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--bg3);color:var(--text);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;transition:border-color .15s}
+input:focus,select:focus{border-color:var(--accent)}
+select option{background:var(--bg3)}
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.order-layout{display:grid;grid-template-columns:1fr 300px;gap:16px;height:calc(100vh - 130px)}
+.menu-scroll{overflow-y:auto}
+.cat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.dish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.dish-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.dish-card:hover{border-color:var(--border2);background:var(--bg3)}
+.dish-card.in-order{border-color:var(--accent);background:var(--accent2)}
+.dish-n{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px}
+.dish-p{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--accent);margin-top:6px}
+.dish-qty-lbl{font-size:10px;color:var(--accent);margin-top:4px}
+.order-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+.order-panel-hdr{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.panel-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.order-items-list{flex:1;overflow-y:auto;padding:8px}
+.oi{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:5px}
+.oi:hover{background:var(--bg3)}
+.oi-name{flex:1;font-size:12px;color:var(--text2)}
+.qty-ctrl{display:flex;align-items:center;gap:4px}
+.qty-btn{width:22px;height:22px;padding:0;display:flex;align-items:center;justify-content:center;font-size:14px;border-radius:4px}
+.oi-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2);min-width:55px;text-align:right}
+.order-footer{padding:14px 16px;border-top:1px solid var(--border);flex-shrink:0}
+.order-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.total-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.total-n{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--accent)}
+.empty-state{padding:32px;text-align:center;color:var(--text3);font-size:12px}
+.report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.rep-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.rep-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.rep-val{font-family:'IBM Plex Mono',monospace;font-size:22px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.bar-lbl{width:140px;font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.bar-track{flex:1;background:var(--bg3);border-radius:2px;height:6px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent);border-radius:2px}
+.bar-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);min-width:36px;text-align:right}
+.notif{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--accent);border-radius:8px;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);z-index:200;transition:all .3s}
+.notif.hide{transform:translateY(20px);opacity:0}
+.server-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--red);transition:background .3s}
+.status-dot.online{background:var(--accent)}
+.loading{opacity:.5;pointer-events:none}
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="logo">
+    <div class="logo-name">RestManager</div>
+    <div class="logo-sub">Spring Boot · SQLite</div>
+  </div>
+  <nav>
+    <div class="nav-section">Головна</div>
+    <div class="nav-item active" onclick="go('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".8"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".4"/></svg>
+      Дашборд
+    </div>
+    <div class="nav-section">Управління</div>
+    <div class="nav-item" onclick="go('menu')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Меню страв
+    </div>
+    <div class="nav-item" onclick="go('new-order')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Нове замовлення
+    </div>
+    <div class="nav-item" onclick="go('orders')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h6M5 5h3M5 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Замовлення
+    </div>
+    <div class="nav-item" onclick="go('staff')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 13c0-2.761 2.239-4 5-4s5 1.239 5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M12 7v4M10 9h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Персонал
+    </div>
+    <div class="nav-section">Аналітика</div>
+    <div class="nav-item" onclick="go('reports')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12L5 8l3 2 3-4 3 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Звіти
+    </div>
+  </nav>
+</aside>
+
+<main>
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Дашборд</div>
+    <div class="topbar-actions">
+      <div class="server-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">перевірка...</span>
+      </div>
+      <div id="topbar-btns"></div>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+</main>
+
+<div id="modal-root"></div>
+<div id="notif-root"></div>
+
+<script>
+const API = 'http://localhost:8080/api';
+const STATUS = {
+  CREATED:     {label:'Створено',  cls:'badge-gray'},
+  IN_PROGRESS: {label:'В процесі',cls:'badge-amber'},
+  COMPLETED:   {label:'Виконано', cls:'badge-teal'},
+  CLOSED:      {label:'Закрито',  cls:'badge-blue'},
+};
+
+const fmt  = n => Number(n).toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2});
+const ini  = n => n.split(' ').slice(0,2).map(w=>w[0]).join('');
+const now  = () => { const d=new Date(),p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+
+// ── API HELPERS ───────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  try {
+    const res = await fetch(API + path, {
+      method,
+      headers: {'Content-Type':'application/json'},
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  } catch(e) {
+    notify('❌ Помилка: ' + e.message);
+    throw e;
+  }
+}
+
+const GET    = path => api('GET', path);
+const POST   = (path, body) => api('POST', path, body);
+const PUT    = (path, body) => api('PUT', path, body);
+const PATCH  = (path, body) => api('PATCH', path, body);
+const DELETE = path => api('DELETE', path);
+
+// ── SERVER STATUS ─────────────────────────────────────────────────────────────
+async function checkServer() {
+  try {
+    await fetch(API + '/dishes');
+    document.getElementById('status-dot').classList.add('online');
+    document.getElementById('status-text').textContent = 'сервер онлайн';
+  } catch {
+    document.getElementById('status-dot').classList.remove('online');
+    document.getElementById('status-text').textContent = 'сервер офлайн';
+  }
+}
+setInterval(checkServer, 5000);
+checkServer();
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+let currentPage = 'dashboard';
+let newOrderItems = [];
+const TITLES = {dashboard:'Дашборд',menu:'Меню страв','new-order':'Нове замовлення',orders:'Замовлення',staff:'Персонал',reports:'Звіти'};
+
+function go(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const idx = {dashboard:0,menu:2,'new-order':3,orders:4,staff:5,reports:7};
+  document.querySelectorAll('.nav-item')[idx[page]]?.classList.add('active');
+  document.getElementById('page-title').textContent = TITLES[page]||page;
+  const btns = document.getElementById('topbar-btns');
+  btns.innerHTML = '';
+  if(page==='menu')   btns.innerHTML='<button class="primary" onclick="openAddDish()">+ Додати страву</button>';
+  if(page==='orders') btns.innerHTML='<button class="primary" onclick="go(\'new-order\')">+ Нове замовлення</button>';
+  if(page==='staff')  btns.innerHTML='<button class="primary" onclick="openAddStaff()">+ Додати співробітника</button>';
+  const renders = {dashboard:renderDashboard,menu:renderMenu,'new-order':renderNewOrder,orders:renderOrders,staff:renderStaff,reports:renderReports};
+  (renders[page]||renderDashboard)();
+}
+
+function loading(msg='Завантаження...') {
+  document.getElementById('content').innerHTML = `<div class="empty-state">${msg}</div>`;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function renderDashboard() {
+  loading();
+  const [dishes, orders, staff] = await Promise.all([
+    GET('/dishes'), GET('/orders'), GET('/employees')
+  ]);
+  const revenue = orders.filter(o=>o.status==='COMPLETED'||o.status==='CLOSED').reduce((s,o)=>s+(o.total||0),0);
+  const active  = orders.filter(o=>o.status==='IN_PROGRESS').length;
+  document.getElementById('content').innerHTML = `
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n" style="color:var(--accent)">${dishes.length}</div><div class="stat-l">Страв у меню</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--blue)">${orders.length}</div><div class="stat-l">Всього замовлень</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--amber)">${active}</div><div class="stat-l">Активних</div></div>
+      <div class="stat"><div class="stat-n" style="color:var(--teal)">${fmt(revenue)}</div><div class="stat-l">Дохід (грн)</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Останні замовлення</h3><button onclick="go('orders')">Всі →</button></div>
+      ${ordersTable(orders.slice(-5).reverse())}
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Персонал</h3><button onclick="go('staff')">Всі →</button></div>
+      ${staffTable(staff.slice(0,3))}
+    </div>`;
+}
+
+// ── MENU ──────────────────────────────────────────────────────────────────────
+async function renderMenu() {
+  loading();
+  const dishes = await GET('/dishes');
+  const cats = [...new Set(dishes.map(d=>d.category))];
+  document.getElementById('content').innerHTML = cats.map(cat=>`
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><h3>${cat}</h3></div>
+      <table><thead><tr><th>Назва</th><th>Опис</th><th>Ціна</th><th></th></tr></thead><tbody>
+      ${dishes.filter(d=>d.category===cat).map(d=>`<tr>
+        <td style="font-weight:500;color:var(--text)">${d.name}</td>
+        <td style="color:var(--text3)">${d.description||''}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;color:var(--accent)">${fmt(d.price)} грн</td>
+        <td style="display:flex;gap:6px">
+          <button onclick="openEditDish(${d.id})">Ред.</button>
+          <button class="danger" onclick="deleteDish(${d.id})">Видалити</button>
+        </td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>`).join('') || '<div class="empty-state">Меню порожнє</div>';
+}
+
+function openAddDish() {
+  modal(`<h3>Нова страва</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Назва</label><input id="m-name" placeholder="Назва страви"></div>
+      <div class="form-group"><label>Ціна (грн)</label><input id="m-price" type="number" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label>Категорія</label><input id="m-cat" placeholder="Напр. Салати"></div>
+    <div class="form-group"><label>Опис</label><input id="m-desc" placeholder="Короткий опис"></div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Скасувати</button>
+      <button class="primary" onclick="saveDish()">Додати</button>
+    </div>`);
+}
+
+async function openEditDish(id) {
+  const d = await GET('/dishes/'+id);
+  modal(`<h3>Редагувати страву</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Назва</label><input id="m-name" value="${d.name}"></div>
+      <div class="form-group"><label>Ціна (грн)</label><input id="m-price" type="number" value="${d.price}"></div>
+    </div>
+    <div class="form-group"><label>Категорія</label><input id="m-cat" value="${d.category}"></div>
+    <div class="form-group"><label>Опис</label><input id="m-desc" value="${d.description||''}"></div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Скасувати</button>
+      <button class="primary" onclick="saveDish(${id})">Зберегти</button>
+    </div>`);
+}
+
+async function saveDish(id) {
+  const name  = document.getElementById('m-name')?.value.trim();
+  const price = parseFloat(document.getElementById('m-price')?.value);
+  const cat   = document.getElementById('m-cat')?.value.trim()||'Інше';
+  const desc  = document.getElementById('m-desc')?.value.trim()||'';
+  if(!name||isNaN(price)||price<=0){alert('Введіть назву та ціну');return;}
+  const body = {name,price,category:cat,description:desc};
+  if(id) await PUT('/dishes/'+id, body);
+  else   await POST('/dishes', body);
+  closeModal();
+  notify(id?'✓ Страву оновлено':'✓ Страву додано');
+  renderMenu();
+}
+
+async function deleteDish(id) {
+  if(!confirm('Видалити страву?'))return;
+  await DELETE('/dishes/'+id);
+  notify('✓ Страву видалено');
+  renderMenu();
+}
+
+// ── NEW ORDER ─────────────────────────────────────────────────────────────────
+async function renderNewOrder() {
+  newOrderItems = [];
+  loading('Завантаження меню...');
+  const dishes = await GET('/dishes');
+  const cats = [...new Set(dishes.map(d=>d.category))];
+  document.getElementById('content').innerHTML = `
+    <div class="order-layout">
+      <div class="menu-scroll">
+        <div style="margin-bottom:16px"><input id="menu-search" placeholder="Пошук страви..." style="width:100%" oninput="filterDishes()"></div>
+        <div id="menu-cats"></div>
+      </div>
+      <div class="order-panel">
+        <div class="order-panel-hdr">
+          <div class="panel-title">Замовлення</div>
+          <div class="form-group"><label>Ім'я клієнта *</label><input id="client-name" placeholder="Введіть ім'я"></div>
+          <div class="form-group"><label>Телефон</label><input id="client-phone" placeholder="+380..."></div>
+        </div>
+        <div class="order-items-list" id="order-items-list"><div class="empty-state">Оберіть страви з меню</div></div>
+        <div class="order-footer">
+          <div class="order-total-row">
+            <span class="total-lbl">Разом</span>
+            <span class="total-n" id="order-total">0.00 грн</span>
+          </div>
+          <button class="primary" style="width:100%" onclick="submitOrder()">Оформити замовлення</button>
+        </div>
+      </div>
+    </div>`;
+  window._allDishes = dishes;
+  renderDishGrid(dishes);
+}
+
+function filterDishes() {
+  const q = document.getElementById('menu-search')?.value.toLowerCase()||'';
+  renderDishGrid((window._allDishes||[]).filter(d=>d.name.toLowerCase().includes(q)||d.category.toLowerCase().includes(q)));
+}
+
+function renderDishGrid(list) {
+  const cats = [...new Set(list.map(d=>d.category))];
+  const el = document.getElementById('menu-cats'); if(!el)return;
+  el.innerHTML = cats.map(cat=>`
+    <div style="margin-bottom:20px">
+      <div class="cat-label">${cat}</div>
+      <div class="dish-grid">
+        ${list.filter(d=>d.category===cat).map(d=>{
+          const inO=newOrderItems.find(i=>i.dishId===d.id);
+          return `<div class="dish-card${inO?' in-order':''}" onclick="toggleDish(${d.id},'${d.name.replace(/'/g,"\\'")}',${d.price})">
+            <div class="dish-n">${d.name}</div>
+            <div class="dish-p">${fmt(d.price)} грн</div>
+            ${inO?`<div class="dish-qty-lbl">в замовленні: ${inO.qty} шт.</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleDish(dishId, name, price) {
+  const ex = newOrderItems.find(i=>i.dishId===dishId);
+  if(ex) ex.qty++;
+  else newOrderItems.push({dishId,name,price,qty:1});
+  filterDishes();
+  renderOrderItems();
+}
+
+function changeQty(dishId,delta) {
+  const idx=newOrderItems.findIndex(i=>i.dishId===dishId);
+  if(idx<0)return;
+  newOrderItems[idx].qty+=delta;
+  if(newOrderItems[idx].qty<=0)newOrderItems.splice(idx,1);
+  filterDishes();
+  renderOrderItems();
+}
+
+function renderOrderItems() {
+  const el=document.getElementById('order-items-list');
+  const tot=document.getElementById('order-total');
+  if(!el)return;
+  if(!newOrderItems.length){el.innerHTML='<div class="empty-state">Оберіть страви з меню</div>';if(tot)tot.textContent='0.00 грн';return;}
+  let total=0;
+  el.innerHTML=newOrderItems.map(i=>{
+    const sub=i.price*i.qty;total+=sub;
+    return `<div class="oi">
+      <div class="oi-name">${i.name}</div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${i.dishId},-1)">−</button>
+        <span style="font-size:12px;min-width:16px;text-align:center">${i.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${i.dishId},1)">+</button>
+      </div>
+      <div class="oi-sub">${fmt(sub)}</div>
+    </div>`;
+  }).join('');
+  if(tot)tot.textContent=fmt(total)+' грн';
+}
+
+async function submitOrder() {
+  const name=document.getElementById('client-name')?.value.trim();
+  if(!name){alert('Введіть ім\'я клієнта');return;}
+  if(!newOrderItems.length){alert('Додайте хоча б одну страву');return;}
+  const phone=document.getElementById('client-phone')?.value.trim()||'';
+  await POST('/orders',{clientName:name,clientPhone:phone,items:newOrderItems.map(i=>({dishId:i.dishId,qty:i.qty}))});
+  notify('✓ Замовлення збережено в базу даних');
+  go('orders');
+}
+
+// ── ORDERS ────────────────────────────────────────────────────────────────────
+function ordersTable(orders) {
+  if(!orders.length)return'<div class="empty-state">Замовлень немає</div>';
+  return`<table><thead><tr><th>#</th><th>Клієнт</th><th>Позицій</th><th>Сума</th><th>Статус</th><th></th></tr></thead><tbody>`+
+    orders.map(o=>{
+      const s=STATUS[o.status]||STATUS.CREATED;
+      return`<tr>
+        <td style="font-family:'IBM Plex Mono',monospace;color:var(--text3)">#${o.id}</td>
+        <td><span style="font-weight:500;color:var(--text)">${o.clientName}</span><br><span style="font-size:11px;color:var(--text3)">${o.createdAt}</span></td>
+        <td>${(o.items||[]).length}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;color:var(--accent)">${fmt(o.total||0)}</td>
+        <td><span class="badge ${s.cls}">${s.label}</span></td>
+        <td style="display:flex;gap:6px">
+          <button onclick="openOrderDetail(${o.id})">Деталі</button>
+          ${o.status!=='CLOSED'?`<button class="success" onclick="closeOrder(${o.id})">Закрити</button>`:''}
+        </td>
+      </tr>`;
+    }).join('')+'</tbody></table>';
+}
+
+async function renderOrders() {
+  loading();
+  const orders = await GET('/orders');
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-header"><h3>Замовлення (${orders.length})</h3></div>
+      ${ordersTable([...orders].reverse())}
+    </div>`;
+}
+
+async function closeOrder(id) {
+  await PATCH('/orders/'+id+'/status',{status:'CLOSED'});
+  notify('✓ Замовлення закрито');
+  renderOrders();
+}
+
+async function openOrderDetail(id) {
+  const o = await GET('/orders/'+id);
+  const s = STATUS[o.status]||STATUS.CREATED;
+  modal(`<h3>Замовлення #${o.id}</h3>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+      <span style="color:var(--text2)">${o.clientName} ${o.clientPhone?'· '+o.clientPhone:''}</span>
+      <span class="badge ${s.cls}">${s.label}</span>
+    </div>
+    <table style="margin-bottom:12px"><tbody>
+      ${(o.items||[]).map(i=>`<tr>
+        <td style="padding:5px 0;color:var(--text2)">${i.dishName}</td>
+        <td style="padding:5px 8px;color:var(--text3)">×${i.qty}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;color:var(--accent);text-align:right">${fmt(i.subtotal)}</td>
+      </tr>`).join('')}
+    </tbody></table>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace">
+      <span style="color:var(--text3)"> Разом </span><span style="color:var(--accent)">${fmt(o.total||0)} грн</span>
+    </div>
+    <div class="form-group" style="margin-top:14px"><label>Змінити статус</label>
+      <select id="m-status">
+        ${Object.entries(STATUS).map(([k,v])=>`<option value="${k}"${o.status===k?' selected':''}>${v.label}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Закрити</button>
+      <button class="primary" onclick="saveOrderStatus(${id})">Зберегти статус</button>
+    </div>`);
+}
+
+async function saveOrderStatus(id) {
+  const status=document.getElementById('m-status')?.value;
+  await PATCH('/orders/'+id+'/status',{status});
+  closeModal();
+  notify('✓ Статус оновлено в базі даних');
+  renderOrders();
+}
+
+// ── STAFF ─────────────────────────────────────────────────────────────────────
+function staffTable(staff) {
+  if(!staff.length)return'<div class="empty-state">Персоналу немає</div>';
+  return`<table><thead><tr><th>Ім'я</th><th>Роль</th><th>Зарплата</th><th>Деталі</th><th></th></tr></thead><tbody>`+
+    staff.map(e=>{
+      const cls=e.role==='Адміністратор'?'badge-blue':e.role==='Кухар'?'badge-teal':'badge-amber';
+      return`<tr>
+        <td style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;border-radius:50%;background:var(--bg4);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0">${ini(e.name)}</div>
+          <span style="font-weight:500;color:var(--text)">${e.name}</span>
+        </td>
+        <td><span class="badge ${cls}">${e.role}</span></td>
+        <td style="font-family:'IBM Plex Mono',monospace">${(e.salary||0).toLocaleString()} грн</td>
+        <td style="color:var(--text3)">${e.extra||''}</td>
+        <td><button class="danger" onclick="deleteStaff(${e.id})">Видалити</button></td>
+      </tr>`;
+    }).join('')+'</tbody></table>';
+}
+
+async function renderStaff() {
+  loading();
+  const staff = await GET('/employees');
+  document.getElementById('content').innerHTML=`
+    <div class="card">
+      <div class="card-header"><h3>Персонал (${staff.length})</h3></div>
+      ${staffTable(staff)}
+    </div>`;
+}
+
+function openAddStaff() {
+  modal(`<h3>Новий співробітник</h3>
+    <div class="form-group"><label>Ім'я</label><input id="m-name" placeholder="Прізвище Ім'я"></div>
+    <div class="form-group"><label>Роль</label>
+      <select id="m-role"><option>Офіціант</option><option>Кухар</option><option>Адміністратор</option></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Зарплата (грн)</label><input id="m-salary" type="number" placeholder="20000"></div>
+      <div class="form-group"><label>Деталі</label><input id="m-extra" placeholder="Спеціалізація..."></div>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">Скасувати</button>
+      <button class="primary" onclick="saveStaff()">Додати</button>
+    </div>`);
+}
+
+async function saveStaff() {
+  const name=document.getElementById('m-name')?.value.trim();
+  const role=document.getElementById('m-role')?.value;
+  const salary=parseFloat(document.getElementById('m-salary')?.value)||0;
+  const extra=document.getElementById('m-extra')?.value.trim()||'';
+  if(!name){alert('Введіть ім\'я');return;}
+  await POST('/employees',{name,role,salary,extra});
+  closeModal();
+  notify('✓ Співробітника додано в базу даних');
+  renderStaff();
+}
+
+async function deleteStaff(id) {
+  if(!confirm('Видалити співробітника?'))return;
+  await DELETE('/employees/'+id);
+  notify('✓ Співробітника видалено');
+  renderStaff();
+}
+
+// ── REPORTS ───────────────────────────────────────────────────────────────────
+async function renderReports() {
+  loading();
+  const orders = await GET('/orders');
+  const revenue=orders.filter(o=>o.status==='COMPLETED'||o.status==='CLOSED').reduce((s,o)=>s+(o.total||0),0);
+  const allRev=orders.reduce((s,o)=>s+(o.total||0),0);
+  const done=orders.filter(o=>o.status==='COMPLETED'||o.status==='CLOSED').length;
+  const dishCount={};
+  orders.forEach(o=>(o.items||[]).forEach(i=>{dishCount[i.dishName]=(dishCount[i.dishName]||0)+i.qty;}));
+  const top=Object.entries(dishCount).sort((a,b)=>b[1]-a[1]);
+  const maxQ=top[0]?top[0][1]:1;
+  document.getElementById('content').innerHTML=`
+    <div class="report-grid">
+      <div class="rep-card"><div class="rep-lbl">Загальний дохід</div><div class="rep-val" style="color:var(--teal)">${fmt(revenue)} грн</div></div>
+      <div class="rep-card"><div class="rep-lbl">Виконано / Всього</div><div class="rep-val" style="color:var(--accent)">${done} / ${orders.length}</div></div>
+      <div class="rep-card"><div class="rep-lbl">Середній чек</div><div class="rep-val" style="color:var(--amber)">${orders.length?fmt(allRev/orders.length):'0.00'} грн</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Популярність страв</h3></div>
+      <div style="padding:16px">
+        ${top.length?top.map(([name,qty])=>`
+          <div class="bar-row">
+            <div class="bar-lbl">${name}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round(qty/maxQ*100)}%"></div></div>
+            <div class="bar-val">${qty} шт.</div>
+          </div>`).join(''):'<div class="empty-state">Даних немає</div>'}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>По статусах</h3></div>
+      <div style="padding:16px;display:flex;gap:20px;flex-wrap:wrap">
+        ${Object.entries(STATUS).map(([k,v])=>`
+          <div style="text-align:center">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:22px;margin-bottom:6px">${orders.filter(o=>o.status===k).length}</div>
+            <span class="badge ${v.cls}">${v.label}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── MODAL & NOTIFY ────────────────────────────────────────────────────────────
+function modal(html) {
+  document.getElementById('modal-root').innerHTML=`<div class="modal-backdrop" onclick="closeOnBack(event)"><div class="modal">${html}</div></div>`;
+}
+function closeModal(){document.getElementById('modal-root').innerHTML='';}
+function closeOnBack(e){if(e.target===e.currentTarget)closeModal();}
+function notify(msg) {
+  const el=document.getElementById('notif-root');
+  el.innerHTML=`<div class="notif">${msg}</div>`;
+  setTimeout(()=>{const n=el.querySelector('.notif');if(n)n.classList.add('hide');},2200);
+  setTimeout(()=>el.innerHTML='',2600);
+}
+
+go('dashboard');
+</script>
+</body>
+</html>
