@@ -20,7 +20,6 @@ public class OrderController {
     private final OrderItemRepository orderItemRepository;
     private final DishRepository dishRepository;
 
-    // DTO для повної інформації про замовлення
     record OrderResponse(
         Long id, String clientName, String clientPhone,
         String status, String createdAt,
@@ -28,17 +27,15 @@ public class OrderController {
     ) {}
 
     record OrderItemDetail(Long dishId, String dishName, Integer qty, Double price, Double subtotal) {}
-
     record CreateOrderRequest(String clientName, String clientPhone, List<ItemRequest> items) {}
     record ItemRequest(Long dishId, Integer qty) {}
     record StatusRequest(String status) {}
+    record AddItemRequest(Long dishId, Integer quantity) {}
 
-    // GET /api/orders — всі замовлення з деталями
+    // GET /api/orders
     @GetMapping
     public List<OrderResponse> getAll() {
-        return orderRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+        return orderRepository.findAll().stream().map(this::toResponse).toList();
     }
 
     // GET /api/orders/1
@@ -52,30 +49,69 @@ public class OrderController {
     // POST /api/orders — створити замовлення
     @PostMapping
     public OrderResponse create(@RequestBody CreateOrderRequest req) {
-        // Зберегти клієнта
-        Client client = new Client(null, req.clientName(), req.clientPhone() != null ? req.clientPhone() : "");
+        Client client = new Client(null,
+            req.clientName(),
+            req.clientPhone() != null ? req.clientPhone() : "");
         client = clientRepository.save(client);
 
-        // Зберегти замовлення
         String now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         Order order = new Order(null, client.getId(), "CREATED", now);
         order = orderRepository.save(order);
 
-        // Зберегти позиції
-        for (ItemRequest item : req.items()) {
-            OrderItem oi = new OrderItem(null, order.getId(), item.dishId(), item.qty());
-            orderItemRepository.save(oi);
+        if (req.items() != null) {
+            for (ItemRequest item : req.items()) {
+                OrderItem oi = new OrderItem(null, order.getId(), item.dishId(), item.qty());
+                orderItemRepository.save(oi);
+            }
         }
-
         return toResponse(order);
     }
 
     // PATCH /api/orders/1/status — змінити статус
     @PatchMapping("/{id}/status")
-    public ResponseEntity<OrderResponse> updateStatus(@PathVariable Long id, @RequestBody StatusRequest req) {
+    public ResponseEntity<OrderResponse> updateStatus(
+            @PathVariable Long id, @RequestBody StatusRequest req) {
         return orderRepository.findById(id).map(order -> {
             order.setStatus(req.status());
             return ResponseEntity.ok(toResponse(orderRepository.save(order)));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // PATCH /api/orders/1/add-item — додати страву до замовлення
+    @PatchMapping("/{id}/add-item")
+    public ResponseEntity<OrderResponse> addItem(
+            @PathVariable Long id, @RequestBody AddItemRequest req) {
+        return orderRepository.findById(id).map(order -> {
+            // Перевіряємо чи страва вже є в замовленні
+            List<OrderItem> existing = orderItemRepository.findByOrderId(id);
+            Optional<OrderItem> found = existing.stream()
+                    .filter(oi -> oi.getDishId().equals(req.dishId()))
+                    .findFirst();
+
+            if (found.isPresent()) {
+                // Збільшуємо кількість
+                OrderItem oi = found.get();
+                oi.setQuantity(oi.getQuantity() + req.quantity());
+                orderItemRepository.save(oi);
+            } else {
+                // Додаємо нову позицію
+                OrderItem oi = new OrderItem(null, id, req.dishId(), req.quantity());
+                orderItemRepository.save(oi);
+            }
+            return ResponseEntity.ok(toResponse(order));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // PATCH /api/orders/1/remove-item — видалити страву із замовлення
+    @PatchMapping("/{id}/remove-item/{dishId}")
+    public ResponseEntity<OrderResponse> removeItem(
+            @PathVariable Long id, @PathVariable Long dishId) {
+        return orderRepository.findById(id).map(order -> {
+            orderItemRepository.findByOrderId(id).stream()
+                    .filter(oi -> oi.getDishId().equals(dishId))
+                    .findFirst()
+                    .ifPresent(oi -> orderItemRepository.deleteById(oi.getId()));
+            return ResponseEntity.ok(toResponse(order));
         }).orElse(ResponseEntity.notFound().build());
     }
 
@@ -83,14 +119,15 @@ public class OrderController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!orderRepository.existsById(id)) return ResponseEntity.notFound().build();
-        orderItemRepository.findByOrderId(id).forEach(oi -> orderItemRepository.deleteById(oi.getId()));
+        orderItemRepository.findByOrderId(id)
+                .forEach(oi -> orderItemRepository.deleteById(oi.getId()));
         orderRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
-    // Перетворити Order у повну відповідь з деталями
     private OrderResponse toResponse(Order order) {
-        Client client = clientRepository.findById(order.getClientId()).orElse(new Client(null, "Невідомо", ""));
+        Client client = clientRepository.findById(order.getClientId())
+                .orElse(new Client(null, "Невідомо", ""));
         List<OrderItem> items = orderItemRepository.findByOrderId(order.getId());
         List<OrderItemDetail> details = items.stream().map(oi -> {
             Dish dish = dishRepository.findById(oi.getDishId()).orElse(null);

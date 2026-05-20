@@ -3,77 +3,105 @@ package ua.edu.restaurant.service;
 import ua.edu.restaurant.exception.OrderNotFoundException;
 import ua.edu.restaurant.exception.ValidationException;
 import ua.edu.restaurant.model.*;
-import ua.edu.restaurant.repository.DishRepository;
-import ua.edu.restaurant.repository.OrderRepository;
+import ua.edu.restaurant.util.ApiClient;
+import ua.edu.restaurant.util.JsonParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderService {
-    private final OrderRepository orderRepository;
-    private final DishRepository dishRepository;
-    private int clientIdCounter = 1;
-
-    public OrderService(OrderRepository orderRepository, DishRepository dishRepository) {
-        this.orderRepository = orderRepository;
-        this.dishRepository = dishRepository;
-    }
 
     public Order createOrder(String clientName, String clientPhone) {
-        if (clientName == null || clientName.trim().isEmpty()) {
+        if (clientName == null || clientName.trim().isEmpty())
             throw new ValidationException("Ім'я клієнта не може бути порожнім.");
-        }
-        Client client = new Client(clientIdCounter++, clientName.trim(), clientPhone);
-        Order order = new Order(orderRepository.getNextId(), client);
-        return orderRepository.save(order);
+
+        String body = "{\"clientName\":\"" + clientName + "\"," +
+                "\"clientPhone\":\"" + (clientPhone != null ? clientPhone : "") + "\"," +
+                "\"items\":[]}";
+        String json = ApiClient.post("/orders", body);
+        return parseOrder(json);
     }
 
     public Order addDishToOrder(int orderId, int dishId, int quantity) {
         Order order = getOrderById(orderId);
-        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CLOSED) {
+        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CLOSED)
             throw new ValidationException("Не можна змінювати завершене або закрите замовлення.");
-        }
-        Dish dish = dishRepository.findById(dishId);
-        if (dish == null) {
-            throw new ValidationException("Страву з ID " + dishId + " не знайдено в меню.");
-        }
-        if (quantity <= 0) {
-            throw new ValidationException("Кількість повинна бути більше нуля.");
-        }
-        order.addItem(new OrderItem(dish, quantity));
-        return orderRepository.save(order);
+
+        String patchBody = "{\"dishId\":" + dishId + ",\"quantity\":" + quantity + "}";
+        ApiClient.patch("/orders/" + orderId + "/add-item", patchBody);
+        return getOrderById(orderId);
     }
 
     public Order removeDishFromOrder(int orderId, int dishId) {
         Order order = getOrderById(orderId);
-        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CLOSED) {
+        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CLOSED)
             throw new ValidationException("Не можна змінювати завершене або закрите замовлення.");
-        }
-        boolean removed = order.removeItem(dishId);
-        if (!removed) {
-            throw new ValidationException("Страву з ID " + dishId + " не знайдено у замовленні.");
-        }
-        return orderRepository.save(order);
+
+        ApiClient.patch("/orders/" + orderId + "/remove-item/" + dishId, null);
+        return getOrderById(orderId);
     }
 
     public Order updateOrderStatus(int orderId, OrderStatus newStatus) {
-        Order order = getOrderById(orderId);
-        order.setStatus(newStatus);
-        return orderRepository.save(order);
+        String body = "{\"status\":\"" + newStatus.name() + "\"}";
+        String json = ApiClient.patch("/orders/" + orderId + "/status", body);
+        return parseOrder(json);
     }
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        String json = ApiClient.get("/orders");
+        List<String> items = JsonParser.parseArray(json);
+        List<Order> orders = new ArrayList<>();
+        for (String item : items) orders.add(parseOrder(item));
+        return orders;
     }
 
     public List<Order> getOrdersByStatus(OrderStatus status) {
-        return orderRepository.findByStatus(status);
+        List<Order> all = getAllOrders();
+        List<Order> result = new ArrayList<>();
+        for (Order o : all) if (o.getStatus() == status) result.add(o);
+        return result;
     }
 
     public Order getOrderById(int orderId) {
-        Order order = orderRepository.findById(orderId);
-        if (order == null) {
+        String json = ApiClient.get("/orders/" + orderId);
+        if (json == null || json.isBlank() || json.equals("null"))
             throw new OrderNotFoundException("Замовлення з ID " + orderId + " не знайдено.");
+        return parseOrder(json);
+    }
+
+    private Order parseOrder(String json) {
+        int id = JsonParser.getInt(json, "id");
+        String clientName = JsonParser.getString(json, "clientName");
+        String clientPhone = JsonParser.getString(json, "clientPhone");
+        String statusStr = JsonParser.getString(json, "status");
+
+        Client client = new Client(0, clientName, clientPhone);
+        Order order = new Order(id, client);
+
+        try {
+            order.setStatus(OrderStatus.valueOf(statusStr));
+        } catch (Exception e) {
+            order.setStatus(OrderStatus.CREATED);
         }
+
+        int itemsStart = json.indexOf("\"items\"");
+        if (itemsStart >= 0) {
+            int arrStart = json.indexOf("[", itemsStart);
+            int arrEnd = json.lastIndexOf("]");
+            if (arrStart >= 0 && arrEnd > arrStart) {
+                String itemsJson = json.substring(arrStart, arrEnd + 1);
+                List<String> itemList = JsonParser.parseArray(itemsJson);
+                for (String item : itemList) {
+                    int dishId = JsonParser.getInt(item, "dishId");
+                    String dishName = JsonParser.getString(item, "dishName");
+                    double price = JsonParser.getDouble(item, "price");
+                    int qty = JsonParser.getInt(item, "qty");
+                    Dish dish = new Dish(dishId, dishName, price, "", "");
+                    order.addItem(new OrderItem(dish, qty));
+                }
+            }
+        }
+
         return order;
     }
 }

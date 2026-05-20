@@ -3,22 +3,22 @@ package ua.edu.restaurant.report;
 import ua.edu.restaurant.model.Order;
 import ua.edu.restaurant.model.OrderItem;
 import ua.edu.restaurant.model.OrderStatus;
-import ua.edu.restaurant.repository.OrderRepository;
+import ua.edu.restaurant.service.OrderService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ReportService {
-    private final OrderRepository orderRepository;
+    private final OrderService orderService;
 
-    public ReportService(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+    public ReportService(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     public double calculateTotalRevenue() {
         double total = 0;
-        for (Order order : orderRepository.findAll()) {
+        for (Order order : orderService.getAllOrders()) {
             if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CLOSED) {
                 total += order.getTotalPrice();
             }
@@ -27,7 +27,7 @@ public class ReportService {
     }
 
     public void printOrdersReport() {
-        List<Order> orders = orderRepository.findAll();
+        List<Order> orders = orderService.getAllOrders();
         System.out.println("\n========== ЗВІТ ПО ЗАМОВЛЕННЯХ ==========");
         if (orders.isEmpty()) {
             System.out.println("Замовлень немає.");
@@ -45,20 +45,20 @@ public class ReportService {
     }
 
     public void printRevenueReport() {
-        List<Order> allOrders = orderRepository.findAll();
-        int total = allOrders.size();
-        int completed = orderRepository.findByStatus(OrderStatus.COMPLETED).size()
-                + orderRepository.findByStatus(OrderStatus.CLOSED).size();
+        List<Order> allOrders = orderService.getAllOrders();
+        long completed = allOrders.stream()
+            .filter(o -> o.getStatus() == OrderStatus.COMPLETED || o.getStatus() == OrderStatus.CLOSED)
+            .count();
 
         System.out.println("\n========== ФІНАНСОВИЙ ЗВІТ ==========");
-        System.out.printf("Всього замовлень:     %d%n", total);
+        System.out.printf("Всього замовлень:     %d%n", allOrders.size());
         System.out.printf("Виконаних замовлень:  %d%n", completed);
         System.out.printf("Загальний дохід:      %.2f грн%n", calculateTotalRevenue());
     }
 
     public void printDishPopularityReport() {
         Map<String, Integer> dishCount = new HashMap<>();
-        for (Order order : orderRepository.findAll()) {
+        for (Order order : orderService.getAllOrders()) {
             for (OrderItem item : order.getItems()) {
                 String name = item.getDish().getName();
                 dishCount.put(name, dishCount.getOrDefault(name, 0) + item.getQuantity());
@@ -71,7 +71,7 @@ public class ReportService {
             return;
         }
         dishCount.entrySet().stream()
-                .sorted((a, b) -> b.getValue() - a.getValue())
-                .forEach(e -> System.out.printf("  %-25s — %d порц.%n", e.getKey(), e.getValue()));
+            .sorted((a, b) -> b.getValue() - a.getValue())
+            .forEach(e -> System.out.printf("  %-25s — %d порц.%n", e.getKey(), e.getValue()));
     }
 }

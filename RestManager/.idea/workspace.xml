@@ -5,17 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="535c7432-3bcf-481a-b643-8f86a00eece1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/webserver/src/test/java/ua/edu/restaurant/webserver/model/DishTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/11ae4c98-121b-459e-8883-3aa3fc444e99.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/11ae4c98-121b-459e-8883-3aa3fc444e99/storage_v2/_src_/schema/main.uQUzAA.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RestManager.iml" beforeDir="false" afterPath="$PROJECT_DIR$/RestManager.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/restaurant.db" beforeDir="false" afterPath="$PROJECT_DIR$/restaurant.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/app/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/app/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/report/ReportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/report/ReportService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/repository/OrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DatabaseConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/util/DatabaseConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/service/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/service/EmployeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/service/MenuService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/service/MenuService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/service/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ua/edu/restaurant/service/OrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/src/main/java/ua/edu/restaurant/webserver/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/src/main/java/ua/edu/restaurant/webserver/config/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/src/main/java/ua/edu/restaurant/webserver/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/src/main/java/ua/edu/restaurant/webserver/controller/OrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webserver/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/webserver/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +90,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
+    "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "SQL Dialects"
@@ -208,6 +209,13 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="535c7432-3bcf-481a-b643-8f86a00eece1" name="Changes" comment="" />
@@ -224,7 +232,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778239742629</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Add Spring Boot web server with SQLite">
+      <option name="closed" value="true" />
+      <created>1778504008985</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1778504008985</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,7 +271,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Додано базу данних" />
-    <option name="LAST_COMMIT_MESSAGE" value="Додано базу данних" />
+    <MESSAGE value="Add Spring Boot web server with SQLite" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Spring Boot web server with SQLite" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -264,6 +281,11 @@
           <url>file://$PROJECT_DIR$/webserver/src/main/java/ua/edu/restaurant/webserver/model/Dish.java</url>
           <line>21</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ua/edu/restaurant/ui/ConsoleMenu.java</url>
+          <line>209</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ExceptionInInitializerError" package="java.lang" />
